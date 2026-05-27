@@ -106,7 +106,7 @@ class BuildDefaultValuesUseCaseTest {
     @Test
     fun `result contains all expected keys`() {
         val result = useCase("bmw-m4-gt3")
-        val expectedCount = allParameters.sumOf { if (it.cornerSpecific) 4 else 1 }
+        val expectedCount = allParameters.fold(0) { acc, p -> acc + if (p.cornerSpecific) 4 else 1 }
         assertEquals(expectedCount, result.size)
     }
 }
