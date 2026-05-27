@@ -1,0 +1,1 @@
+- [LMU Setup Manager project snapshot](project_lmusetupmanager.md) — stack, architecture, gotchas for this single-module Compose/Hilt/Room app
