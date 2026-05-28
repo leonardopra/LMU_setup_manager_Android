@@ -26,8 +26,10 @@ import kotlinx.serialization.json.Json
 
 sealed class Screen(val route: String) {
     data object Home : Screen("home")
-    data object Editor : Screen("editor/{carId}") {
-        fun createRoute(carId: String) = "editor/$carId"
+    data object Editor : Screen("editor/{carId}?setupId={setupId}") {
+        fun createRoute(carId: String, setupId: String? = null): String =
+            if (setupId != null) "editor/$carId?setupId=$setupId"
+            else "editor/$carId"
     }
     data object Library : Screen("library")
     data object Diff : Screen("diff/{setupIdA}/{setupIdB}") {
@@ -81,7 +83,14 @@ fun AppNavigation(
 
         composable(
             route = Screen.Editor.route,
-            arguments = listOf(navArgument("carId") { type = NavType.StringType }),
+            arguments = listOf(
+                navArgument("carId") { type = NavType.StringType },
+                navArgument("setupId") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }
+            ),
             enterTransition = {
                 slideInHorizontally(
                     initialOffsetX = { it },
@@ -127,7 +136,7 @@ fun AppNavigation(
         ) {
             SavedSetupsScreen(
                 onSetupSelected = { setup ->
-                    navController.navigate(Screen.Editor.createRoute(setup.carId))
+                    navController.navigate(Screen.Editor.createRoute(setup.carId, setup.id))
                 },
                 onBack = { navController.popBackStack() },
                 onCompareTwoSetups = { idA, idB ->

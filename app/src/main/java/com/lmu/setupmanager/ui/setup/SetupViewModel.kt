@@ -35,6 +35,14 @@ class SetupViewModel @Inject constructor(
     )
     val uiState: StateFlow<SetupUiState> = _uiState.asStateFlow()
 
+    init {
+        savedStateHandle.get<String>("setupId")?.let { id ->
+            viewModelScope.launch {
+                repository.getSetupById(id)?.let { saved -> loadSetup(saved) }
+            }
+        }
+    }
+
     // ── Public commands ───────────────────────────────────────────────────────
 
     fun initForCar(carId: String) {
