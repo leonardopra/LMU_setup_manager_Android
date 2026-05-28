@@ -1,5 +1,6 @@
 package com.lmu.setupmanager.ui.setup
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lmu.setupmanager.data.repository.SetupRepository
@@ -20,14 +21,17 @@ private const val MAX_HISTORY = 50
 @HiltViewModel
 class SetupViewModel @Inject constructor(
     private val repository: SetupRepository,
-    private val buildDefaultValues: BuildDefaultValuesUseCase
+    private val buildDefaultValues: BuildDefaultValuesUseCase,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val past = ArrayDeque<Setup>()
     private val future = ArrayDeque<Setup>()
 
     private val _uiState = MutableStateFlow(
-        SetupUiState(setup = createNewSetup("bmw-m4-gt3"))
+        SetupUiState(setup = createNewSetup(
+            savedStateHandle.get<String>("carId") ?: "bmw-m4-gt3"
+        ))
     )
     val uiState: StateFlow<SetupUiState> = _uiState.asStateFlow()
 
