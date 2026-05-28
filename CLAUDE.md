@@ -20,7 +20,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | Local DB | Room 2.6.1 |
 | Async | Coroutines + Flow |
 | State | ViewModel + `lifecycle-runtime-compose` |
-| Serialization | `kotlinx.serialization-json` (for `SetupEntity.valuesJson`) |
+| Serialization | `kotlinx.serialization-json` (Room `SetupEntity.valuesJson`, `Setup` export/import, Wizard route arg encoding) |
 
 No network layer — all car/track/parameter data is hardcoded static Kotlin objects in `data/static/`.
 
@@ -39,6 +39,8 @@ No network layer — all car/track/parameter data is hardcoded static Kotlin obj
 - **One-shot events** (save success, error): stored as flags/nullable in UiState, consumed via `consumeX()` methods that reset them to `false`/`null`. Do not replace with `SharedFlow`/`Channel`.
 - **Static data** (`data/static/`): top-level `val` lists imported directly by screens and use cases — not injected via Hilt.
 - **DI split**: `DatabaseModule` (object, `@Provides`) and `RepositoryModule` (abstract class, `@Binds`) both live in `di/AppModule.kt`.
+- **ThemeViewModel**: obtained via `hiltViewModel()` in `MainActivity`, then passed explicitly as a parameter through `AppNavigation` → `HomeScreen`. It is **not** retrieved via `hiltViewModel()` inside `HomeScreen`.
+- **Existing screens**: `Screen.Diff` (`SetupDiffScreen`) and `Screen.Wizard` (`WizardScreen`) already exist — do not recreate them.
 
 ## Conventions
 
@@ -46,14 +48,17 @@ No network layer — all car/track/parameter data is hardcoded static Kotlin obj
 - `kotlin.code.style=official` (set in `gradle.properties`).
 - No XML layouts — 100% Compose.
 
-## Active next feature: Feedback / Smart Adjustment
+## Active next feature: FeedbackScreen
 
-`FeedbackItem`, `ResolvedAdjustment`, `SelectedSymptom`, and `data/static/FeedbackItems.kt` are the foundation for a planned smart-adjustment feature (symptom → parameter delta mapping). The models and static data exist but no ViewModel, UseCase, or Screen consumes them yet. **This is the next area of active development — do not remove this code.**
+The smart-adjustment pipeline is partially complete:
 
-Implementation entry points:
-1. New `ResolveAdjustmentsUseCase` consuming `FeedbackItem` + `SelectedSymptom`
-2. New `FeedbackViewModel` + `FeedbackScreen`
-3. New `Screen.Feedback` route in `AppNavigation.kt`
+**Done** — `FeedbackItem`, `ResolvedAdjustment`, `SelectedSymptom` models; `FeedbackItems.kt` static data; `ResolveAdjustmentsUseCase`; `WizardScreen` + `WizardViewModel` (launched via FAB in `SetupScreen` → `Screen.Wizard`).
+
+**Remaining** — a standalone `FeedbackScreen` accessible from main navigation, not tied to an open setup editor:
+1. New `FeedbackViewModel` + `FeedbackScreen`
+2. New `Screen.Feedback` route in `AppNavigation.kt`
+
+Do not remove any existing feedback/wizard code.
 
 ## Known issues / gotchas
 
@@ -69,5 +74,5 @@ Implementation entry points:
 |---|---|
 | Add a car | `data/static/Cars.kt` → append to `lmgt3Cars` |
 | Add a setup parameter | `data/static/Parameters.kt` → add to the relevant category list |
-| Add a track | `data/static/Tracks.kt` → append to `wecTracks` |
+| Add a track | `data/static/Tracks.kt` → append to `tracks` |
 | Add feedback symptoms | `data/static/FeedbackItems.kt` → append `FeedbackItem` entries |
