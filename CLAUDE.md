@@ -48,15 +48,15 @@ No network layer — all car/track/parameter data is hardcoded static Kotlin obj
 - `kotlin.code.style=official` (set in `gradle.properties`).
 - No XML layouts — 100% Compose.
 
-## Active next feature: FeedbackScreen
+## Smart Adjustment / Feedback pipeline — complete
 
-The smart-adjustment pipeline is partially complete:
+All pieces are implemented:
 
-**Done** — `FeedbackItem`, `ResolvedAdjustment`, `SelectedSymptom` models; `FeedbackItems.kt` static data; `ResolveAdjustmentsUseCase`; `WizardScreen` + `WizardViewModel` (launched via FAB in `SetupScreen` → `Screen.Wizard`).
-
-**Remaining** — a standalone `FeedbackScreen` accessible from main navigation, not tied to an open setup editor:
-1. New `FeedbackViewModel` + `FeedbackScreen`
-2. New `Screen.Feedback` route in `AppNavigation.kt`
+- `FeedbackItem`, `ResolvedAdjustment`, `SelectedSymptom` models
+- `FeedbackItems.kt` static data; `ResolveAdjustmentsUseCase`
+- `WizardScreen` + `WizardViewModel` (launched via FAB in `SetupScreen` → `Screen.Wizard`)
+- `FeedbackScreen` + `FeedbackViewModel` in `ui/feedback/` — standalone entry from `HomeScreen` ("Smart Feedback Wizard" button) → car selection → track selection → `Screen.Wizard`
+- `Screen.Feedback` route in `AppNavigation.kt`
 
 Do not remove any existing feedback/wizard code.
 

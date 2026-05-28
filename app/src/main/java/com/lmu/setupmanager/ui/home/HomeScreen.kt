@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.SettingsBrightness
+import androidx.compose.material.icons.filled.AutoFixHigh
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -42,6 +43,7 @@ import com.lmu.setupmanager.ui.theme.ThemeViewModel
 fun HomeScreen(
     onCarSelected: (carId: String) -> Unit,
     onOpenLibrary: () -> Unit,
+    onOpenFeedback: () -> Unit,
     themeViewModel: ThemeViewModel
 ) {
     val themeState by themeViewModel.themeState.collectAsStateWithLifecycle()
@@ -104,6 +106,18 @@ fun HomeScreen(
             }
 
             Spacer(Modifier.height(16.dp))
+            OutlinedButton(
+                onClick = onOpenFeedback,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(
+                    Icons.Default.AutoFixHigh,
+                    contentDescription = null,
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+                Text("Smart Feedback Wizard")
+            }
+            Spacer(Modifier.height(8.dp))
             OutlinedButton(
                 onClick = onOpenLibrary,
                 modifier = Modifier.fillMaxWidth()

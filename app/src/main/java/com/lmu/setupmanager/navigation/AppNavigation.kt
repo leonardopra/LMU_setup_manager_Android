@@ -15,6 +15,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import android.net.Uri
 import com.lmu.setupmanager.ui.diff.SetupDiffScreen
+import com.lmu.setupmanager.ui.feedback.FeedbackScreen
 import com.lmu.setupmanager.ui.home.HomeScreen
 import com.lmu.setupmanager.ui.saved.SavedSetupsScreen
 import com.lmu.setupmanager.ui.setup.SetupScreen
@@ -35,6 +36,7 @@ sealed class Screen(val route: String) {
     data object Diff : Screen("diff/{setupIdA}/{setupIdB}") {
         fun createRoute(setupIdA: String, setupIdB: String) = "diff/$setupIdA/$setupIdB"
     }
+    data object Feedback : Screen("feedback")
     data object Wizard : Screen("wizard/{carId}/{currentValues}") {
         fun createRoute(carId: String, currentValuesJson: String): String {
             val encoded = Uri.encode(currentValuesJson)
@@ -76,6 +78,9 @@ fun AppNavigation(
                 },
                 onOpenLibrary = {
                     navController.navigate(Screen.Library.route)
+                },
+                onOpenFeedback = {
+                    navController.navigate(Screen.Feedback.route)
                 },
                 themeViewModel = themeViewModel
             )
@@ -169,6 +174,29 @@ fun AppNavigation(
             SetupDiffScreen(
                 setupIdA = setupIdA,
                 setupIdB = setupIdB,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = Screen.Feedback.route,
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { it },
+                    animationSpec = tween(TRANSITION_DURATION, easing = EaseInOutCubic)
+                ) + fadeIn(tween(TRANSITION_DURATION))
+            },
+            popExitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { it },
+                    animationSpec = tween(TRANSITION_DURATION, easing = EaseInOutCubic)
+                ) + fadeOut(tween(TRANSITION_DURATION / 2))
+            }
+        ) {
+            FeedbackScreen(
+                onNavigateToWizard = { carId, currentValuesJson ->
+                    navController.navigate(Screen.Wizard.createRoute(carId, currentValuesJson))
+                },
                 onBack = { navController.popBackStack() }
             )
         }
