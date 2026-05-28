@@ -2,6 +2,7 @@ package com.lmu.setupmanager.ui.setup
 
 import android.net.Uri
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -35,6 +36,7 @@ import androidx.navigation.NavController
 import com.lmu.setupmanager.data.static.allParameters
 import com.lmu.setupmanager.data.static.categoryLabels
 import com.lmu.setupmanager.data.static.categoryOrder
+import com.lmu.setupmanager.domain.model.Conditions
 import com.lmu.setupmanager.domain.usecase.BuildDefaultValuesUseCase
 import com.lmu.setupmanager.navigation.Screen
 import com.lmu.setupmanager.ui.components.CategorySection
@@ -46,11 +48,21 @@ import kotlinx.serialization.json.Json
 @Composable
 fun SetupScreen(
     navController: NavController,
+    carId: String,
+    trackId: String = "",
+    conditions: Conditions = Conditions.DRY,
     viewModel: SetupViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+
+    // Initialise the editor for the selected car, track and conditions
+    LaunchedEffect(carId) {
+        viewModel.initForCar(carId)
+        viewModel.setTrackId(trackId)
+        viewModel.setConditions(conditions)
+    }
 
     // One-shot: consume wizard adjustments delivered via back-stack SavedStateHandle
     val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
@@ -94,10 +106,19 @@ fun SetupScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text = uiState.setup.name,
-                        style = MaterialTheme.typography.titleLarge
-                    )
+                    Column {
+                        Text(
+                            text = uiState.setup.name,
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                        if (trackId.isNotEmpty()) {
+                            Text(
+                                text = "$trackId · $conditions",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
                 },
                 actions = {
                     IconButton(

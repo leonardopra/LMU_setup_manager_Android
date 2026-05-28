@@ -28,4 +28,7 @@ interface SetupDao {
 
     @Query("DELETE FROM setups WHERE id = :id")
     suspend fun deleteSetupById(id: String)
+
+    @Query("UPDATE setups SET name = :name, updatedAt = :updatedAt WHERE id = :id")
+    suspend fun renameSetup(id: String, name: String, updatedAt: Long)
 }

@@ -1,15 +1,45 @@
+# ── Gradle ───────────────────────────────────────────────────────────────────
+.gradle/
+build/
+**/build/
+gradle-app.setting
+!gradle-wrapper.jar
+!gradle-wrapper.properties
+
+# ── Android Studio / IntelliJ ─────────────────────────────────────────────────
 *.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+.idea/caches/
+.idea/libraries/
+.idea/modules.xml
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+.idea/deploymentTargetSelector.xml
+.idea/appInsightsSettings.xml
+.idea/studiobot.xml
+
+# Kept (shared project config):
+# .idea/runConfigurations.xml
+# .idea/gradle.xml
+# .idea/misc.xml
+# .idea/compiler.xml
+# .idea/vcs.xml
+# .idea/AndroidProjectSystem.xml
+
+# ── Local config ──────────────────────────────────────────────────────────────
 local.properties
+keystore.properties
+
+# ── Native build ──────────────────────────────────────────────────────────────
+.externalNativeBuild/
+.cxx/
+
+# ── Captures & profiling ──────────────────────────────────────────────────────
+/captures/
+
+# ── OS ────────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Claude Code ───────────────────────────────────────────────────────────────
+CLAUDE.local.md

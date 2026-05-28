@@ -8,4 +8,6 @@ interface SetupRepository {
     suspend fun getSetupById(id: String): Setup?
     suspend fun saveSetup(setup: Setup)
     suspend fun deleteSetup(id: String)
+    suspend fun renameSetup(id: String, newName: String)
+    suspend fun duplicateSetup(id: String): Setup
 }

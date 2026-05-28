@@ -6,6 +6,7 @@ import com.lmu.setupmanager.data.local.toEntity
 import com.lmu.setupmanager.domain.model.Setup
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.util.UUID
 import javax.inject.Inject
 
 class SetupRepositoryImpl @Inject constructor(
@@ -23,4 +24,21 @@ class SetupRepositoryImpl @Inject constructor(
 
     override suspend fun deleteSetup(id: String) =
         dao.deleteSetupById(id)
+
+    override suspend fun renameSetup(id: String, newName: String) {
+        dao.renameSetup(id, newName, System.currentTimeMillis())
+    }
+
+    override suspend fun duplicateSetup(id: String): Setup {
+        val original = dao.getSetupById(id)?.toDomain()
+            ?: error("Setup $id not found")
+        val copy = original.copy(
+            id = UUID.randomUUID().toString(),
+            name = "${original.name} (Copy)",
+            createdAt = System.currentTimeMillis(),
+            updatedAt = System.currentTimeMillis()
+        )
+        dao.insertSetup(copy.toEntity())
+        return copy
+    }
 }

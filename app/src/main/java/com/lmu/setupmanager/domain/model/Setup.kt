@@ -1,7 +1,11 @@
 package com.lmu.setupmanager.domain.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 enum class Conditions { DRY, WET, MIXED }
 
+@Serializable
 data class Setup(
     val id: String,
     val name: String,
