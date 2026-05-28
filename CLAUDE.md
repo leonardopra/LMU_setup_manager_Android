@@ -62,11 +62,10 @@ Do not remove any existing feedback/wizard code.
 
 ## Known issues / gotchas
 
-1. **`SavedSetupsScreen` load bug**: tapping a saved setup navigates to a *fresh* editor for that car — it does not restore the saved parameter values. Requires passing the setup ID and a `viewModel.loadSetup(id)` call.
-2. **`SetupViewModel` car init**: reads `carId` from `SavedStateHandle` (injected by Hilt from the navigation back stack). Fallback `"bmw-m4-gt3"` applies only in unit tests where no real navigation exists.
+1. **`SetupViewModel` car init**: reads `carId` from `SavedStateHandle` (injected by Hilt from the navigation back stack). Fallback `"bmw-m4-gt3"` applies only in unit tests where no real navigation exists.
 3. **`BuildDefaultValuesUseCase` direct call in `SetupScreen`**: used inside `remember` to compute default values for modified-count badges — bypasses Hilt injection (intentional workaround, not a bug).
 4. **Room**: `exportSchema = false`, DB version 1, no migrations. Any schema change needs `.addMigrations(...)` in `AppModule.kt` or a destructive migration.
-5. **`SetupEntity.conditions`**: stored as enum name string (no TypeConverter). Renaming the `Conditions` enum will silently break deserialization via `Conditions.valueOf(conditions)`.
+5. **`SetupEntity.conditions`**: stored as enum name string via `ConditionsConverter` (`@TypeConverters` on `SetupDatabase`). Renaming enum constants requires updating `ConditionsConverter` — the storage format stays the same, no migration needed.
 
 ## Extending static data
 

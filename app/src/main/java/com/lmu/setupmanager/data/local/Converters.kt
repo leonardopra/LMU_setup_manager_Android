@@ -1,7 +1,7 @@
 package com.lmu.setupmanager.data.local
 
-import com.lmu.setupmanager.domain.model.Conditions
 import com.lmu.setupmanager.domain.model.Setup
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -12,7 +12,7 @@ fun SetupEntity.toDomain(): Setup = Setup(
     name = name,
     carId = carId,
     trackId = trackId,
-    conditions = Conditions.valueOf(conditions),
+    conditions = conditions,   // Conditions → Conditions (Room handles String↔Conditions)
     values = json.decodeFromString<Map<String, Float>>(valuesJson),
     notes = notes,
     createdAt = createdAt,
@@ -24,7 +24,7 @@ fun Setup.toEntity(): SetupEntity = SetupEntity(
     name = name,
     carId = carId,
     trackId = trackId,
-    conditions = conditions.name,
+    conditions = conditions,   // Conditions → Conditions (Room handles String↔Conditions)
     valuesJson = json.encodeToString(values),
     notes = notes,
     createdAt = createdAt,
