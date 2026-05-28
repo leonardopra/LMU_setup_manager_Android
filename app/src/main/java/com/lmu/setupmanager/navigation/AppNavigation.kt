@@ -13,11 +13,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import android.net.Uri
 import com.lmu.setupmanager.ui.diff.SetupDiffScreen
 import com.lmu.setupmanager.ui.home.HomeScreen
 import com.lmu.setupmanager.ui.saved.SavedSetupsScreen
 import com.lmu.setupmanager.ui.setup.SetupScreen
 import com.lmu.setupmanager.ui.theme.ThemeViewModel
+import com.lmu.setupmanager.ui.wizard.WizardScreen
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 sealed class Screen(val route: String) {
     data object Home : Screen("home")
@@ -27,6 +32,12 @@ sealed class Screen(val route: String) {
     data object Library : Screen("library")
     data object Diff : Screen("diff/{setupIdA}/{setupIdB}") {
         fun createRoute(setupIdA: String, setupIdB: String) = "diff/$setupIdA/$setupIdB"
+    }
+    data object Wizard : Screen("wizard/{carId}/{currentValues}") {
+        fun createRoute(carId: String, currentValuesJson: String): String {
+            val encoded = Uri.encode(currentValuesJson)
+            return "wizard/$carId/$encoded"
+        }
     }
 }
 
@@ -90,7 +101,7 @@ fun AppNavigation(
                 ) + fadeOut(tween(TRANSITION_DURATION / 2))
             }
         ) {
-            SetupScreen()
+            SetupScreen(navController = navController)
         }
 
         composable(
@@ -149,6 +160,35 @@ fun AppNavigation(
             SetupDiffScreen(
                 setupIdA = setupIdA,
                 setupIdB = setupIdB,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = Screen.Wizard.route,
+            arguments = listOf(
+                navArgument("carId") { type = NavType.StringType },
+                navArgument("currentValues") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val carId = backStackEntry.arguments?.getString("carId") ?: return@composable
+            val currentValuesJson = Uri.decode(
+                backStackEntry.arguments?.getString("currentValues") ?: "{}"
+            )
+            val currentValues: Map<String, Float> = try {
+                Json.decodeFromString(currentValuesJson)
+            } catch (e: Exception) {
+                emptyMap()
+            }
+            WizardScreen(
+                carId = carId,
+                currentValues = currentValues,
+                onAdjustmentsApplied = { adjustments ->
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("adjustments", Json.encodeToString(adjustments))
+                    navController.popBackStack()
+                },
                 onBack = { navController.popBackStack() }
             )
         }
