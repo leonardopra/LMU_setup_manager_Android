@@ -18,8 +18,10 @@ import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material.icons.filled.CompareArrows
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,9 +31,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -53,6 +59,30 @@ fun SavedSetupsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val selected = uiState.selectedIds
+    var deleteTargetId by remember { mutableStateOf<String?>(null) }
+
+    // ── Delete confirmation dialog ─────────────────────────────────────────────
+    if (deleteTargetId != null) {
+        AlertDialog(
+            onDismissRequest = { deleteTargetId = null },
+            title = { Text("Delete Setup") },
+            text = { Text("Are you sure you want to delete this setup? This action cannot be undone.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.deleteSetup(deleteTargetId!!)
+                        deleteTargetId = null
+                    },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error
+                    )
+                ) { Text("Delete") }
+            },
+            dismissButton = {
+                TextButton(onClick = { deleteTargetId = null }) { Text("Cancel") }
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -121,7 +151,7 @@ fun SavedSetupsScreen(
                                 canSelect = isSelected || selected.size < 2,
                                 onClick = { onSetupSelected(setup) },
                                 onToggleSelect = { viewModel.toggleSelect(setup.id) },
-                                onDelete = { viewModel.deleteSetup(setup.id) }
+                                onDelete = { deleteTargetId = setup.id }
                             )
                         }
                     }
