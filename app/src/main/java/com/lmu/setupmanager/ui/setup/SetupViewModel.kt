@@ -3,10 +3,12 @@ package com.lmu.setupmanager.ui.setup
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.lmu.setupmanager.data.local.toEntity
 import com.lmu.setupmanager.data.repository.SetupRepository
 import com.lmu.setupmanager.domain.model.Conditions
 import com.lmu.setupmanager.domain.model.Setup
 import com.lmu.setupmanager.domain.usecase.BuildDefaultValuesUseCase
+import com.lmu.setupmanager.domain.usecase.ExportSetupUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,6 +24,7 @@ private const val MAX_HISTORY = 50
 class SetupViewModel @Inject constructor(
     private val repository: SetupRepository,
     private val buildDefaultValues: BuildDefaultValuesUseCase,
+    private val exportSetup: ExportSetupUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -144,6 +147,15 @@ class SetupViewModel @Inject constructor(
                     _uiState.update { it.copy(isSaving = false, error = e.message) }
                 }
         }
+    }
+
+    fun shareSetup() {
+        val json = exportSetup(_uiState.value.setup.toEntity())
+        _uiState.update { it.copy(exportJson = json) }
+    }
+
+    fun consumeExportJson() {
+        _uiState.update { it.copy(exportJson = null) }
     }
 
     fun consumeSavedSuccessfully() {

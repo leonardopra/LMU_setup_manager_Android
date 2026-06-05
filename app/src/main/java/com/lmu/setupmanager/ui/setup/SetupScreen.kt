@@ -1,5 +1,6 @@
 package com.lmu.setupmanager.ui.setup
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,6 +13,7 @@ import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.AutoFixHigh
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -34,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -56,6 +59,7 @@ fun SetupScreen(
     viewModel: SetupViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     var showRenameDialog by remember { mutableStateOf(false) }
@@ -96,6 +100,17 @@ fun SetupScreen(
             viewModel.consumeError()
         }
     }
+    // One-shot: fire an Android share sheet with the exported setup JSON
+    LaunchedEffect(uiState.exportJson) {
+        uiState.exportJson?.let { json ->
+            val sendIntent = Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_TEXT, json)
+            }
+            context.startActivity(Intent.createChooser(sendIntent, "Export setup"))
+            viewModel.consumeExportJson()
+        }
+    }
 
     val defaultValues = remember(uiState.setup.carId) {
         BuildDefaultValuesUseCase()(uiState.setup.carId)
@@ -124,6 +139,9 @@ fun SetupScreen(
                     }
                     IconButton(onClick = viewModel::redo, enabled = uiState.canRedo) {
                         Icon(Icons.AutoMirrored.Filled.Redo, contentDescription = "Redo")
+                    }
+                    IconButton(onClick = viewModel::shareSetup) {
+                        Icon(Icons.Default.Share, contentDescription = "Export setup")
                     }
                     IconButton(onClick = viewModel::saveSetup) {
                         Icon(Icons.Default.Save, contentDescription = "Save")

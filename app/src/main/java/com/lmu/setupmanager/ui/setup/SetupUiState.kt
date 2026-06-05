@@ -8,5 +8,6 @@ data class SetupUiState(
     val canRedo: Boolean = false,
     val isSaving: Boolean = false,
     val savedSuccessfully: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val exportJson: String? = null
 )
