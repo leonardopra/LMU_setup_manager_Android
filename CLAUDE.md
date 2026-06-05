@@ -75,3 +75,17 @@ Do not remove any existing feedback/wizard code.
 | Add a setup parameter | `data/static/Parameters.kt` → add to the relevant category list |
 | Add a track | `data/static/Tracks.kt` → append to `tracks` |
 | Add feedback symptoms | `data/static/FeedbackItems.kt` → append `FeedbackItem` entries |
+
+## Feature backlog
+
+### ✅ Completate
+- Fix SavedSetupsScreen: tapping un setup apre l'editor con i valori caricati
+- Delete setup (`deleteSetupById` in DAO + repository + conferma UI)
+- Export setup: share intent JSON via `ExportSetupUseCase`
+- Import setup: file picker JSON via `ImportSetupUseCase` + Snackbar feedback
+
+### 📋 In pianificazione
+- **Duplicate setup**: copia un setup esistente assegnando nuovo UUID e label "Copy of X"
+- **Rename setup**: modifica inline del label senza riaprire l'editor
+- **Filter saved setups**: filtrare la lista per `carId` o `trackId`
+- **Setup comparison**: visualizzare due setup affiancati con diff evidenziata
